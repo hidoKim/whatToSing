@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum UserRole {
+  user
+  admin
+  anonymous
+}
+
+enum OauthProvider {
+  google
+  kakao
+  naver
+  anonymous
+}
+
+model User {
+  id            BigInt         @id @default(autoincrement()) @map("id")
+  name          String         @db.VarChar(100) @map("name")
+  email         String         @unique @db.VarChar(200) @map("email") 
+  oauthProvider OauthProvider  @map("oauth_provider")
+  oauthId       String         @db.VarChar(100) @map("oauth_id")
+  role          UserRole       @default(user) @map("role") 
+  createdAt     DateTime       @default(now()) @map("created_at") @db.DateTime(6)
+  updatedAt     DateTime       @updatedAt @map("updated_at")  @db.DateTime(6)
+  isDeleted     Boolean        @default(false) @db.TinyInt @map("is_deleted") 
+
+  @@index([email], name: "idx_user_email")
+  @@index([oauthProvider, oauthId], name: "idx_user_oauth")
+  @@map("users") 
+}
